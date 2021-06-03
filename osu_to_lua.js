@@ -21,11 +21,7 @@ module.export("osu_to_lua", function(osu_file_contents) {
 	}
 
 	function hitobj_x_to_track_number(hitobj_x, lane) {
-		console.log(hitobj_x)
-		console.log(lane)
-		var result = Math.floor(hitobj_x * lane / 512)
-		
-		console.log(result)
+		var result = Math.floor(hitobj_x * lane / 512) + 1
 		return result
 	}
 
@@ -39,6 +35,8 @@ module.export("osu_to_lua", function(osu_file_contents) {
 		return hrs + ':' + mins + ':' + secs + '.' + ms;
 	}
 
+    var lane_number = 7
+
 	var _tracks_next_open = {
 		1 : -1,
 		2: -1,
@@ -50,7 +48,7 @@ module.export("osu_to_lua", function(osu_file_contents) {
 	for (var i = 0; i < beatmap.hitObjects.length; i++) {
 		var itr = beatmap.hitObjects[i];
 		var type = itr.objectName;
-		var track = hitobj_x_to_track_number(itr.position[0], 7);
+		var track = hitobj_x_to_track_number(itr.position[0], lane_number);
 		var start_time = itr.startTime
 
 		if (_tracks_next_open[track] >= start_time) {
@@ -92,29 +90,17 @@ module.export("osu_to_lua", function(osu_file_contents) {
 	})
 
 	append_to_output("local rtv = {}");
-	append_to_output("--Your audio assetid should be in the form of \"rbxassetid://...\". Upload audios at \"https://www.roblox.com/develop?View=3\", and copy the uploaded id from the URL.")
 	append_to_output(format("rtv.%s = \"%s\"","AudioAssetId","rbxassetid://FILL_IN_AUDIO_ASSETID_HERE"));
-	append_to_output("--The name of your map.")
 	append_to_output(format("rtv.%s = \"%s\"","AudioFilename",beatmap.Title));
-	append_to_output("--The artist of your map.")
 	append_to_output(format("rtv.%s = \"%s\"","AudioArtist",""));
-	append_to_output("--A description of your map. Will be displayed in the song select list by default.")
 	append_to_output(format("rtv.%s = \"%s\"","AudioDescription",""));
-	append_to_output("--Your cover art assetid should be in the form of \"rbxassetid://...\". Upload images at \https://www.roblox.com/develop?View=13\".")
-	append_to_output("--The uploaded id is the DECAL id, you must use the TEXTURE id here. To get the TEXTURE id, paste the full URL of the DECAL id into the Image property of an ImageLabel. There is a debug ImageLabel under ServerStorage in the mapping test place.")
 	append_to_output(format("rtv.%s = \"%s\"","AudioCoverImageAssetId","rbxassetid://FILL_IN_COVERART_TEXTURE_ASSETID_HERE"));
 	
-	append_to_output("--The difficulty number of your map.")
 	append_to_output(format("rtv.%s = %d","AudioDifficulty",1));
-	append_to_output("--The audio time offset of your map in milliseconds. The default value is -75ms.")
 	append_to_output(format("rtv.%s = %d","AudioTimeOffset",-75));
-	append_to_output("--The audio volume of your map. The default value is 0.5.")
 	append_to_output(format("rtv.%s = %d","AudioVolume",0.5));
-	append_to_output("--The speed at which the notes arrive (in milliseconds) for your map. The default value is 1500ms, or 1.5 seconds from spawn to hit.")
 	append_to_output(format("rtv.%s = %d","AudioNotePrebufferTime",1500));
-	append_to_output("--The map modifier. By default in the mapping place, 0 is normal mode and 1 is a hard mode (which is marked as \"Supporters Only\").")
-	append_to_output(format("rtv.%s = %d","AudioMod",0));
-	append_to_output("--The hit SFX group of your map. Valid values are 0 to 5. Add your own hit SFX in ReplicatedStorage.RobeatsGameCore.HitSFXGroup")
+        append_to_output(format("rtv.%s = %d","AudioLaneKey",lane_number))
 	append_to_output(format("rtv.%s = %d","AudioHitSFXGroup",0));
 
 	append_to_output("rtv.HitObjects = {}")
@@ -125,7 +111,7 @@ module.export("osu_to_lua", function(osu_file_contents) {
 	for (var i = 0; i < beatmap.hitObjects.length; i++) {
 		var itr = beatmap.hitObjects[i];
 		var type = itr.objectName;
-		var track = hitobj_x_to_track_number(itr.position[0]);
+		var track = hitobj_x_to_track_number(itr.position[0], lane_number);
 
 		if (type == "slider") {
 			append_to_output(format("hold(%d,%d,%d) ", itr.startTime, track, itr.duration))
