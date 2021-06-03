@@ -20,8 +20,13 @@ module.export("osu_to_lua", function(osu_file_contents) {
 		return track + "_" + time
 	}
 
-	function hitobj_x_to_track_number(hitobj_x, number_lane) {
-		return Math.floor(hitobj_x * number_lane / 512)
+	function hitobj_x_to_track_number(hitobj_x, lane) {
+		console.log(hitobj_x)
+		console.log(lane)
+		var result = Math.floor(hitobj_x * lane / 512)
+		
+		console.log(result)
+		return result
 	}
 
 	function msToTime(s) {
