@@ -20,18 +20,8 @@ module.export("osu_to_lua", function(osu_file_contents) {
 		return track + "_" + time
 	}
 
-	function hitobj_x_to_track_number(hitobj_x) {
-		var track_number = 1;
-		if (hitobj_x < 100) {
-			track_number = 1;
-		} else if (hitobj_x < 200) {
-			track_number = 2;
-		} else if (hitobj_x < 360) {
-			track_number = 3;
-		} else {
-			track_number = 4;
-		}
-		return track_number;
+	function hitobj_x_to_track_number(hitobj_x, number_lane) {
+		return Math.floor(hitobj_x * number_lane / 512)
 	}
 
 	function msToTime(s) {
@@ -55,7 +45,7 @@ module.export("osu_to_lua", function(osu_file_contents) {
 	for (var i = 0; i < beatmap.hitObjects.length; i++) {
 		var itr = beatmap.hitObjects[i];
 		var type = itr.objectName;
-		var track = hitobj_x_to_track_number(itr.position[0]);
+		var track = hitobj_x_to_track_number(itr.position[0], 7);
 		var start_time = itr.startTime
 
 		if (_tracks_next_open[track] >= start_time) {
