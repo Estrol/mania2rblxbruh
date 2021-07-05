@@ -433,7 +433,7 @@ function beatmapParser() {
     case 'events':
       eventsLines.push(line);
       break;
-	case 'difficulty:
+	case 'difficulty':
 	  diffLines.push(line);
 	  break;
     default:
