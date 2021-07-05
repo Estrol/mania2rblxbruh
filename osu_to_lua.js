@@ -35,7 +35,7 @@ module.export("osu_to_lua", function(osu_file_contents) {
 		return hrs + ':' + mins + ':' + secs + '.' + ms;
 	}
 
-    var lane_number = 7
+    var lane_number = beatmap.circleSize;
 
 	var _tracks_next_open = {
 		1 : -1,
