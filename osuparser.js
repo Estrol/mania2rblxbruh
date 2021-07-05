@@ -7,6 +7,12 @@ function beatmapParser() {
     nbCircles: 0,
     nbSliders: 0,
     nbSpinners: 0,
+	hpDrainRate: 0,
+	circleSize: 0,
+	overralDifficulty: 0,
+	approachRate: 0,
+	sliderMultiplier: 0,
+	sliderTickRate: 0,
     timingPoints: [],
     breakTimes: [],
     hitObjects: []
@@ -20,6 +26,7 @@ function beatmapParser() {
   var timingLines    = [];
   var objectLines    = [];
   var eventsLines    = [];
+  var diffLines		 = [];
   var sectionReg     = /^\[([a-zA-Z0-9]+)\]$/;
   var keyValReg      = /^([a-zA-Z0-9]+)[ ]*:[ ]*(.+)$/;
   var curveTypes     = {
@@ -359,6 +366,48 @@ function beatmapParser() {
 
     beatmap.maxCombo = maxCombo;
   };
+  
+  var parseDifficulty = function (line) {
+	line = line.toString().trim();
+	if (!line) { return; }
+	var propNval = line.split(':')
+	
+	switch (propNval[0].trim()) {
+		case 'HPDrainRate': {
+			beatmap.drainingRate = parseInt(propNval[1].trim());
+			break;
+		}
+		
+		case 'CircleSize': {
+			beatmap.circleSize = parseInt(propNval[1].trim());
+			break;
+		}
+		
+		case 'OverralDifficulty': {
+			beatmap.overralDifficulty = parseInt(propNval[1].trim());
+			break;
+		}
+		
+		case 'ApproachRate': {
+			beatmap.approachRate = parseInt(propNval[1].trim());
+			break;
+		}
+		
+		case 'SliderMultiplier': {
+			beatmap.sliderMultiplier = parseInt(propNval[1].trim());
+			break;
+		}
+		
+		case 'SliderTickRate': {
+			beatmap.sliderTickRate = parseInt(propNval[1].trim());
+			break;
+		}
+		
+		default: {
+			break;
+		}
+	}
+  }
 
   /**
    * Read a single line, parse when key/value, store when further parsing needed
@@ -384,6 +433,9 @@ function beatmapParser() {
     case 'events':
       eventsLines.push(line);
       break;
+	case 'difficulty:
+	  diffLines.push(line);
+	  break;
     default:
       if (!osuSection) {
         match = /^osu file format (v[0-9]+)$/.exec(line);
@@ -424,7 +476,9 @@ function beatmapParser() {
         timingPoints[i].bpm        = timingPoints[i - 1].bpm;
       }
     }
-
+	
+	diffLines.forEach(parseDifficulty);
+	
     objectLines.forEach(parseHitObject);
     beatmap.hitObjects.sort(function (a, b) { return (a.startTime > b.startTime ? 1 : -1); });
 		
